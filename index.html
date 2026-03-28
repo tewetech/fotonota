@@ -109,14 +109,9 @@
 
                 <div class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center shrink-0 gap-4">
                     <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
-                    <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleFileSelect(this)">
                     
-                    <div class="flex gap-4 w-full justify-center">
-                        <button onclick="document.getElementById('cameraInput').click()" class="flex-1 bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors">
-                            <i class="fas fa-camera text-2xl mb-2"></i>
-                            <span class="text-[10px] font-bold">Kamera</span>
-                        </button>
-                        <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors">
+                    <div class="flex w-full justify-center">
+                        <button onclick="document.getElementById('fileInput').click()" class="w-full bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors">
                             <i class="fas fa-image text-2xl mb-2"></i>
                             <span class="text-[10px] font-bold">Galeri File</span>
                         </button>
@@ -311,7 +306,6 @@
                     showPopup('Foto Nota berhasil disimpan ke sistem Cloud!');
                     selectedFile = null;
                     document.getElementById('fileInput').value = '';
-                    document.getElementById('cameraInput').value = '';
                     
                     const disp = document.getElementById('fileNameDisp');
                     disp.innerText = 'Belum ada foto terpilih';
@@ -354,7 +348,7 @@
                         </div>
                         <div class="grid grid-cols-3 gap-2">
                             ${folder.files.map(f => `
-                                <div class="relative group aspect-square rounded-lg overflow-hidden border border-white shadow-sm bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity" onclick="openPreview('${f.id}', '${f.downloadUrl}')">
+                                <div class="relative group aspect-square rounded-lg overflow-hidden border border-white shadow-sm bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity" onclick="openPreview('${f.id}')">
                                     <img src="${f.url}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
                                 </div>
                             `).join('')}
@@ -428,9 +422,9 @@
             setTransform();
         }
 
-        function openPreview(fileId, downloadUrl) {
+        function openPreview(fileId) {
             modalImg.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-            modalDownload.href = downloadUrl;
+            modalDownload.href = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=t&uuid=a5760853-e1aa-4257-a19d-0b479b1adee0&at=ANTm3cyKtRXZyDPPaW7La59MlPnB%3A1768842506044`;
             
             document.getElementById('modal-delete').onclick = function() {
                 closeModal();
