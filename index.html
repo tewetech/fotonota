@@ -103,21 +103,50 @@
         <main class="flex-1 px-6 pb-6 overflow-hidden flex flex-col">
             <div id="content-upload" class="flex flex-col h-full space-y-4 overflow-y-auto custom-scrollbar pr-1">
                 <div class="glass-panel p-5 shrink-0">
-                    <label class="block text-[11px] font-bold mb-2">NAMA FOLDER / TANGGAL</label>
+                    <label class="block text-[11px] font-bold mb-2">NAMA FOLDER</label>
                     <input type="text" id="folderName" placeholder="Contoh: 27-03-2026" class="w-full bg-white/60 border border-white p-3 rounded-xl text-xs focus:outline-none focus:ring-2 ring-cyan-500">
                     <p class="text-[9px] mt-1 opacity-60">*Kosongkan untuk tanggal otomatis hari ini</p>
                 </div>
 
-                <div class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center shrink-0 gap-4">
-                    <input type="file" id="fileInput" accept="image/*" class="absolute w-0 h-0 opacity-0 -z-10" onchange="handleFileSelect(this)">
-                    
-                    <div class="flex w-full justify-center">
-                        <label for="fileInput" class="w-full bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors cursor-pointer">
-                            <i class="fas fa-image text-2xl mb-2"></i>
-                            <span class="text-[10px] font-bold">Galeri File</span>
-                        </label>
+                <div class="flex justify-center gap-2 bg-white/60 p-1.5 rounded-xl border border-[#155e75]/20 shrink-0">
+                        <button type="button" onclick="setUploadMode('camera')" id="btn-mode-cam" class="flex-1 py-2 rounded-lg text-[11px] font-bold bg-transparent text-[#155e75] hover:bg-white/50 transition-all">Kamera</button>
+                    <button type="button" onclick="setUploadMode('file')" id="btn-mode-file" class="flex-1 py-2 rounded-lg text-[11px] font-bold bg-[#155e75] text-white shadow-sm transition-all">Pilih Foto</button>
+                </div>
+
+                <div id="upload-file-area" class="w-full flex-col flex">
+                    <div class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center shrink-0 gap-4">
+                        <input type="file" id="fileInput" accept="image/*" class="absolute w-0 h-0 opacity-0 -z-10" onchange="handleFileSelect(this)">
+                        
+                        <div class="flex w-full justify-center">
+                            <label for="fileInput" class="w-full bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors cursor-pointer">
+                                <i class="fas fa-image text-2xl mb-2"></i>
+                                <span class="text-[10px] font-bold">Galeri File</span>
+                            </label>
+                        </div>
+                        <p class="text-xs font-bold transition-colors" id="fileNameDisp">Belum ada foto terpilih</p>
                     </div>
-                    <p class="text-xs font-bold transition-colors" id="fileNameDisp">Belum ada foto terpilih</p>
+                </div>
+
+                <div id="upload-camera-area" class="hidden w-full flex-col items-center justify-center shrink-0 gap-2">
+                    <div id="camera-permission-area" class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center w-full gap-4">
+                        <div class="w-12 h-12 bg-cyan-100 text-[#155e75] rounded-full flex items-center justify-center mb-2">
+                            <i class="fas fa-camera text-xl"></i>
+                        </div>
+                        <p class="text-[11px] font-bold text-[#155e75]">Izin kamera diperlukan</p>
+                        <button type="button" id="btn-request-cam" onclick="requestCamera()" class="px-6 py-2.5 bg-[#155e75] text-white rounded-xl text-[11px] font-bold shadow-md hover:bg-[#0e3f4f] transition-colors">Izinkan Akses</button>
+                    </div>
+                    
+                    <div id="camera-feed-area" class="hidden relative w-full rounded-xl overflow-hidden bg-black aspect-[3/4] shadow-inner">
+                        <video id="video-element" autoplay playsinline class="w-full h-full object-cover"></video>
+                        <button type="button" onclick="capturePhoto()" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white text-[#155e75] rounded-full w-14 h-14 flex items-center justify-center border-4 border-cyan-200 shadow-lg active:scale-95 transition-transform">
+                            <i class="fas fa-camera text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="camera-preview-area" class="hidden relative w-full rounded-xl overflow-hidden aspect-[3/4] shadow-md">
+                        <img id="captured-image-preview" class="w-full h-full object-cover">
+                        <button type="button" onclick="retakePhoto()" class="absolute top-3 right-3 bg-rose-500 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"><i class="fas fa-redo"></i></button>
+                    </div>
                 </div>
 
                 <button type="button" onclick="processUpload()" id="uploadBtn" class="w-full bg-[#155e75] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform mt-auto shrink-0">
@@ -196,6 +225,7 @@
         let scale = 1, panning = false, pointX = 0, pointY = 0, startX = 0, startY = 0;
         let initialDistance = 0, initialScale = 1;
         let selectedFile = null;
+        let videoStream = null;
 
         function showPopup(msg, isConfirm = false, onConfirm = null) {
             const popup = document.getElementById('custom-popup');
@@ -249,6 +279,103 @@
             }, 200);
         }
 
+        function setUploadMode(mode) {
+            const fileArea = document.getElementById('upload-file-area');
+            const camArea = document.getElementById('upload-camera-area');
+            const btnFile = document.getElementById('btn-mode-file');
+            const btnCam = document.getElementById('btn-mode-cam');
+            
+            if (mode === 'file') {
+                fileArea.classList.remove('hidden');
+                fileArea.classList.add('flex');
+                camArea.classList.add('hidden');
+                camArea.classList.remove('flex');
+                btnFile.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-[#155e75] text-white shadow-sm transition-all';
+                btnCam.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-transparent text-[#155e75] hover:bg-white/50 transition-all';
+                stopCamera();
+            } else {
+                fileArea.classList.add('hidden');
+                fileArea.classList.remove('flex');
+                camArea.classList.remove('hidden');
+                camArea.classList.add('flex');
+                btnCam.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-[#155e75] text-white shadow-sm transition-all';
+                btnFile.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-transparent text-[#155e75] hover:bg-white/50 transition-all';
+            }
+            selectedFile = null;
+            document.getElementById('fileNameDisp').innerText = "Belum ada foto terpilih";
+            document.getElementById('fileNameDisp').classList.remove('text-cyan-600');
+            document.getElementById('fileInput').value = '';
+        }
+
+        function requestCamera() {
+            const btn = document.getElementById('btn-request-cam');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    videoStream = stream;
+                    const video = document.getElementById('video-element');
+                    video.srcObject = stream;
+                    document.getElementById('camera-permission-area').classList.add('hidden');
+                    document.getElementById('camera-feed-area').classList.remove('hidden');
+                    btn.innerHTML = 'Izinkan Akses';
+                })
+                .catch(err => {
+                    showPopup('Gagal mengakses kamera: ' + err.message);
+                    btn.innerHTML = 'Izinkan Akses';
+                });
+        }
+
+        function stopCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            document.getElementById('camera-feed-area').classList.add('hidden');
+            document.getElementById('camera-permission-area').classList.remove('hidden');
+        }
+
+        function dataURLtoFile(dataurl, filename) {
+            let arr = dataurl.split(',');
+            let mime = arr[0].match(/:(.*?);/)[1];
+            let bstr = atob(arr[1]);
+            let n = bstr.length;
+            let u8arr = new Uint8Array(n);
+            while(n--){
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], filename, {type:mime});
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video-element');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            
+            selectedFile = dataURLtoFile(dataUrl, 'foto_kamera_' + Date.now() + '.jpg');
+            
+            document.getElementById('captured-image-preview').src = dataUrl;
+            document.getElementById('camera-feed-area').classList.add('hidden');
+            document.getElementById('camera-preview-area').classList.remove('hidden');
+            
+            const disp = document.getElementById('fileNameDisp');
+            disp.innerText = "Foto siap diunggah dari kamera";
+            disp.classList.add('text-cyan-600');
+            stopCamera();
+        }
+
+        function retakePhoto() {
+            document.getElementById('camera-preview-area').classList.add('hidden');
+            document.getElementById('camera-permission-area').classList.remove('hidden');
+            selectedFile = null;
+            const disp = document.getElementById('fileNameDisp');
+            disp.innerText = "Belum ada foto terpilih";
+            disp.classList.remove('text-cyan-600');
+            requestCamera();
+        }
+
         function switchTab(tab) {
             const contUpload = document.getElementById('content-upload');
             const contGallery = document.getElementById('content-gallery');
@@ -259,6 +386,7 @@
                 contGallery.classList.add('hidden');
                 contGallery.classList.remove('flex');
             } else {
+                stopCamera();
                 contUpload.classList.add('hidden');
                 contUpload.classList.remove('flex');
                 contGallery.classList.remove('hidden');
@@ -310,6 +438,9 @@
                     showPopup('Foto Nota berhasil disimpan ke sistem Cloud!');
                     selectedFile = null;
                     document.getElementById('fileInput').value = '';
+                    
+                    document.getElementById('camera-preview-area').classList.add('hidden');
+                    document.getElementById('camera-permission-area').classList.remove('hidden');
                     
                     const disp = document.getElementById('fileNameDisp');
                     disp.innerText = 'Belum ada foto terpilih';
