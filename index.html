@@ -96,8 +96,8 @@
         </header>
 
         <div class="flex px-6 gap-2 mb-4 shrink-0">
-            <button onclick="switchTab('upload')" id="tab-upload" class="tab-btn active flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">UNGGAH</button>
-            <button onclick="switchTab('gallery')" id="tab-gallery" class="tab-btn flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">GALERI</button>
+            <button type="button" onclick="switchTab('upload')" id="tab-upload" class="tab-btn active flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">UNGGAH</button>
+            <button type="button" onclick="switchTab('gallery')" id="tab-gallery" class="tab-btn flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">GALERI</button>
         </div>
 
         <main class="flex-1 px-6 pb-6 overflow-hidden flex flex-col">
@@ -109,24 +109,24 @@
                 </div>
 
                 <div class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center shrink-0 gap-4">
-                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                    <input type="file" id="fileInput" accept="image/*" class="absolute w-0 h-0 opacity-0 -z-10" onchange="handleFileSelect(this)">
                     
                     <div class="flex w-full justify-center">
-                        <button onclick="document.getElementById('fileInput').click()" class="w-full bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors">
+                        <label for="fileInput" class="w-full bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors cursor-pointer">
                             <i class="fas fa-image text-2xl mb-2"></i>
                             <span class="text-[10px] font-bold">Galeri File</span>
-                        </button>
+                        </label>
                     </div>
                     <p class="text-xs font-bold transition-colors" id="fileNameDisp">Belum ada foto terpilih</p>
                 </div>
 
-                <button onclick="processUpload()" id="uploadBtn" class="w-full bg-[#155e75] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform mt-auto shrink-0">
+                <button type="button" onclick="processUpload()" id="uploadBtn" class="w-full bg-[#155e75] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform mt-auto shrink-0">
                     SIMPAN KE CLOUD
                 </button>
             </div>
 
             <div id="content-gallery" class="hidden flex-col h-full space-y-4">
-                <button onclick="confirmDeleteAll()" class="w-full py-2 bg-rose-500 text-white rounded-xl text-[10px] font-bold shrink-0">
+                <button type="button" onclick="confirmDeleteAll()" class="w-full py-2 bg-rose-500 text-white rounded-xl text-[10px] font-bold shrink-0">
                     <i class="fas fa-trash-sweep mr-1"></i> HAPUS SEMUA DATA
                 </button>
                 <div id="gallery-list" class="flex-1 overflow-y-auto space-y-4 pb-2 pr-1 custom-scrollbar"></div>
@@ -146,7 +146,7 @@
             <div id="modal-img-container" class="hybrid-window w-full max-h-[75vh] flex flex-col overflow-hidden rounded-[24px] relative shadow-2xl">
                 <div class="h-11 flex items-center px-4 border-b border-black/10 select-none shrink-0 bg-white/40">
                     <div class="flex items-center gap-2 w-1/3">
-                        <button id="mac-close-btn" class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] shadow-sm border border-black/10 hover:brightness-90 transition-all flex items-center justify-center cursor-pointer outline-none">
+                        <button type="button" id="mac-close-btn" class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] shadow-sm border border-black/10 hover:brightness-90 transition-all flex items-center justify-center cursor-pointer outline-none">
                             <i class="fa-solid fa-xmark text-[7px] text-white opacity-100"></i>
                         </button>
                         <div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] shadow-sm border border-black/10"></div>
@@ -163,13 +163,13 @@
             </div>
             
             <div class="flex flex-wrap justify-center gap-3 mt-6">
-                <button id="close-btn" class="hybrid-btn px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide flex items-center gap-2 outline-none">
+                <button type="button" id="close-btn" class="hybrid-btn px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide flex items-center gap-2 outline-none">
                     <i class="fa-solid fa-xmark text-sm"></i> Tutup
                 </button>
                 <a id="modal-download" href="#" target="_blank" class="hybrid-btn px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide flex items-center gap-2 outline-none">
                     <i class="fa-solid fa-download text-sm"></i> Unduh
                 </a>
-                <button id="modal-delete" class="bg-gradient-to-b from-rose-500 to-rose-700 text-white px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide flex items-center gap-2 outline-none shadow-md hover:scale-105 active:scale-95 transition-all border border-rose-800/20">
+                <button type="button" id="modal-delete" class="bg-gradient-to-b from-rose-500 to-rose-700 text-white px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide flex items-center gap-2 outline-none shadow-md hover:scale-105 active:scale-95 transition-all border border-rose-800/20">
                     <i class="fa-solid fa-trash text-sm"></i> Hapus
                 </button>
             </div>
@@ -208,11 +208,13 @@
             
             if(isConfirm) {
                 const btnCancel = document.createElement('button');
+                btnCancel.type = 'button';
                 btnCancel.className = 'flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold transition hover:bg-gray-200';
                 btnCancel.innerText = 'Batal';
                 btnCancel.onclick = closePopup;
                 
                 const btnOk = document.createElement('button');
+                btnOk.type = 'button';
                 btnOk.className = 'flex-1 py-2.5 bg-rose-500 text-white rounded-xl text-xs font-bold transition hover:bg-rose-600';
                 btnOk.innerText = 'Ya, Lanjutkan';
                 btnOk.onclick = () => { closePopup(); if(onConfirm) onConfirm(); };
@@ -221,6 +223,7 @@
                 btnContainer.appendChild(btnOk);
             } else {
                 const btnOk = document.createElement('button');
+                btnOk.type = 'button';
                 btnOk.className = 'w-full py-2.5 bg-[#155e75] text-white rounded-xl text-xs font-bold transition hover:bg-[#0e3f4f]';
                 btnOk.innerText = 'Ok !';
                 btnOk.onclick = closePopup;
@@ -345,7 +348,7 @@
                     group.innerHTML = `
                         <div class="flex justify-between items-center mb-3 border-b border-[#155e75]/10 pb-2">
                             <span class="text-[11px] font-bold"><i class="fas fa-folder text-amber-500 mr-2"></i>${folder.name}</span>
-                            <button onclick="deleteAction('${folder.name}', 'folder')" class="text-rose-500 text-[10px]"><i class="fas fa-trash"></i></button>
+                            <button type="button" onclick="deleteAction('${folder.name}', 'folder')" class="text-rose-500 text-[10px]"><i class="fas fa-trash"></i></button>
                         </div>
                         <div class="grid grid-cols-3 gap-2">
                             ${folder.files.map(f => `
