@@ -96,38 +96,20 @@
         </header>
 
         <div class="flex px-6 gap-2 mb-4 shrink-0">
-            <button type="button" onclick="switchTab('upload')" id="tab-upload" class="tab-btn active flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">UNGGAH</button>
-            <button type="button" onclick="switchTab('gallery')" id="tab-gallery" class="tab-btn flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">GALERI</button>
+            <button type="button" onclick="setUploadMode('camera')" id="tab-camera" class="tab-btn active flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">KAMERA</button>
+            <button type="button" onclick="setUploadMode('file')" id="tab-file" class="tab-btn flex-1 py-2 rounded-xl text-xs font-bold transition-all border border-[#155e75]/20">PILIH FOTO</button>
         </div>
 
         <main class="flex-1 px-6 pb-6 overflow-hidden flex flex-col">
-            <div id="content-upload" class="flex flex-col h-full space-y-4 overflow-y-auto custom-scrollbar pr-1">
+            <div id="content-main" class="flex flex-col h-full space-y-4 overflow-y-auto custom-scrollbar pr-1 pb-4">
+                
                 <div class="glass-panel p-5 shrink-0">
                     <label class="block text-[11px] font-bold mb-2">NAMA FOLDER</label>
                     <input type="text" id="folderName" placeholder="Contoh: 27-03-2026" class="w-full bg-white/60 border border-white p-3 rounded-xl text-xs focus:outline-none focus:ring-2 ring-cyan-500">
                     <p class="text-[9px] mt-1 opacity-60">*Kosongkan untuk tanggal otomatis hari ini</p>
                 </div>
 
-                <div class="flex justify-center gap-2 bg-white/60 p-1.5 rounded-xl border border-[#155e75]/20 shrink-0">
-                        <button type="button" onclick="setUploadMode('camera')" id="btn-mode-cam" class="flex-1 py-2 rounded-lg text-[11px] font-bold bg-transparent text-[#155e75] hover:bg-white/50 transition-all">Kamera</button>
-                    <button type="button" onclick="setUploadMode('file')" id="btn-mode-file" class="flex-1 py-2 rounded-lg text-[11px] font-bold bg-[#155e75] text-white shadow-sm transition-all">Pilih Foto</button>
-                </div>
-
-                <div id="upload-file-area" class="w-full flex-col flex">
-                    <div class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center shrink-0 gap-4">
-                        <input type="file" id="fileInput" accept="image/*" class="absolute w-0 h-0 opacity-0 -z-10" onchange="handleFileSelect(this)">
-                        
-                        <div class="flex w-full justify-center">
-                            <label for="fileInput" class="w-full bg-cyan-100 p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-cyan-200 transition-colors cursor-pointer">
-                                <i class="fas fa-image text-2xl mb-2"></i>
-                                <span class="text-[10px] font-bold">Galeri File</span>
-                            </label>
-                        </div>
-                        <p class="text-xs font-bold transition-colors" id="fileNameDisp">Belum ada foto terpilih</p>
-                    </div>
-                </div>
-
-                <div id="upload-camera-area" class="hidden w-full flex-col items-center justify-center shrink-0 gap-2">
+                <div id="upload-camera-area" class="flex w-full flex-col items-center justify-center shrink-0 gap-2">
                     <div id="camera-permission-area" class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center w-full gap-4">
                         <div class="w-12 h-12 bg-cyan-100 text-[#155e75] rounded-full flex items-center justify-center mb-2">
                             <i class="fas fa-camera text-xl"></i>
@@ -149,16 +131,32 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="processUpload()" id="uploadBtn" class="w-full bg-[#155e75] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform mt-auto shrink-0">
+                <div id="upload-file-area" class="hidden w-full flex-col">
+                    <div class="glass-panel p-6 border-dashed border-2 border-[#155e75]/30 flex flex-col items-center justify-center text-center shrink-0 gap-4">
+                        <input type="file" id="fileInput" accept="image/*" class="absolute w-0 h-0 opacity-0 -z-10" onchange="handleFileSelect(this)">
+                        
+                        <div class="flex w-full justify-center">
+                            <label for="fileInput" class="w-full bg-transparent p-4 rounded-xl flex flex-col items-center justify-center text-[#155e75] hover:bg-black/5 transition-colors cursor-pointer">
+                                <i class="fas fa-image text-2xl mb-2"></i>
+                                <span class="text-[10px] font-bold">Galeri File</span>
+                            </label>
+                        </div>
+                        <p class="text-xs font-bold transition-colors" id="fileNameDisp">Belum ada foto terpilih</p>
+                    </div>
+                </div>
+
+                <button type="button" onclick="processUpload()" id="uploadBtn" class="w-full bg-[#155e75] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-cyan-900/20 active:scale-95 transition-transform shrink-0">
                     SIMPAN KE CLOUD
                 </button>
-            </div>
 
-            <div id="content-gallery" class="hidden flex-col h-full space-y-4">
-                <button type="button" onclick="confirmDeleteAll()" class="w-full py-2 bg-rose-500 text-white rounded-xl text-[10px] font-bold shrink-0">
-                    <i class="fas fa-trash-sweep mr-1"></i> HAPUS SEMUA DATA
-                </button>
-                <div id="gallery-list" class="flex-1 overflow-y-auto space-y-4 pb-2 pr-1 custom-scrollbar"></div>
+                <div id="content-gallery" class="flex flex-col mt-4 bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl p-4 relative w-full shrink-0">
+                    <h2 class="text-xs font-bold mb-3 text-center text-[#155e75]"><i class="fas fa-images mr-2"></i>GALERI CLOUD</h2>
+                    <button type="button" onclick="confirmDeleteAll()" class="w-full py-2 mb-4 bg-rose-500 text-white rounded-xl text-[10px] font-bold shrink-0">
+                        <i class="fas fa-trash-sweep mr-1"></i> HAPUS SEMUA DATA
+                    </button>
+                    <div id="gallery-list" class="space-y-4"></div>
+                </div>
+
             </div>
         </main>
 
@@ -282,24 +280,24 @@
         function setUploadMode(mode) {
             const fileArea = document.getElementById('upload-file-area');
             const camArea = document.getElementById('upload-camera-area');
-            const btnFile = document.getElementById('btn-mode-file');
-            const btnCam = document.getElementById('btn-mode-cam');
+            const tabFile = document.getElementById('tab-file');
+            const tabCam = document.getElementById('tab-camera');
             
             if (mode === 'file') {
                 fileArea.classList.remove('hidden');
                 fileArea.classList.add('flex');
                 camArea.classList.add('hidden');
                 camArea.classList.remove('flex');
-                btnFile.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-[#155e75] text-white shadow-sm transition-all';
-                btnCam.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-transparent text-[#155e75] hover:bg-white/50 transition-all';
+                tabFile.classList.add('active');
+                tabCam.classList.remove('active');
                 stopCamera();
             } else {
                 fileArea.classList.add('hidden');
                 fileArea.classList.remove('flex');
                 camArea.classList.remove('hidden');
                 camArea.classList.add('flex');
-                btnCam.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-[#155e75] text-white shadow-sm transition-all';
-                btnFile.className = 'flex-1 py-2 rounded-lg text-[11px] font-bold bg-transparent text-[#155e75] hover:bg-white/50 transition-all';
+                tabCam.classList.add('active');
+                tabFile.classList.remove('active');
             }
             selectedFile = null;
             document.getElementById('fileNameDisp').innerText = "Belum ada foto terpilih";
@@ -376,28 +374,6 @@
             requestCamera();
         }
 
-        function switchTab(tab) {
-            const contUpload = document.getElementById('content-upload');
-            const contGallery = document.getElementById('content-gallery');
-            
-            if(tab === 'upload') {
-                contUpload.classList.remove('hidden');
-                contUpload.classList.add('flex');
-                contGallery.classList.add('hidden');
-                contGallery.classList.remove('flex');
-            } else {
-                stopCamera();
-                contUpload.classList.add('hidden');
-                contUpload.classList.remove('flex');
-                contGallery.classList.remove('hidden');
-                contGallery.classList.add('flex');
-                loadGallery();
-            }
-            
-            document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
-            document.getElementById('tab-gallery').classList.toggle('active', tab === 'gallery');
-        }
-
         function handleFileSelect(input) {
             if(input.files.length > 0) {
                 selectedFile = input.files[0];
@@ -446,6 +422,7 @@
                     disp.innerText = 'Belum ada foto terpilih';
                     disp.classList.remove('text-cyan-600');
                     folderInput.value = '';
+                    loadGallery();
                 })
                 .catch(err => {
                     showLoading(false);
@@ -657,6 +634,11 @@
         modalImgContainer.addEventListener('touchend', () => {
             panning = false;
         });
+
+        window.onload = () => {
+            setUploadMode('camera');
+            loadGallery();
+        };
     </script>
 </body>
 </html>
